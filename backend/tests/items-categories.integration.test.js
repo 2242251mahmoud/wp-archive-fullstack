@@ -80,4 +80,46 @@ describe('Items and categories API integration', () => {
       [5]
     );
   });
+
+  test('GET /api/items/collections returns curated groups', async () => {
+    query
+      .mockResolvedValueOnce({ rows: [{ id: 1, name: 'Gem One' }] })
+      .mockResolvedValueOnce({ rows: [{ id: 2, name: 'Hit One' }] })
+      .mockResolvedValueOnce({ rows: [{ id: 3, name: 'Fresh One' }] });
+
+    const response = await request(app).get('/api/items/collections?limit=1');
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body.hidden_gems).toHaveLength(1);
+    expect(response.body.heavy_hitters).toHaveLength(1);
+    expect(response.body.fresh_finds).toHaveLength(1);
+    expect(query).toHaveBeenCalledTimes(3);
+  });
+
+  test('GET /api/items/insights returns summary payload', async () => {
+    query
+      .mockResolvedValueOnce({
+        rows: [{ total_items: 9, avg_rating: '4.57', max_download_count: 10000 }]
+      })
+      .mockResolvedValueOnce({
+        rows: [{ name: 'WordPress Plugins', item_count: 5 }]
+      })
+      .mockResolvedValueOnce({
+        rows: [{ name: 'Astra', rating: 4.8, download_count: 10000 }]
+      });
+
+    const response = await request(app).get('/api/items/insights');
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body.stats.total_items).toBe(9);
+    expect(response.body.top_category.name).toBe('WordPress Plugins');
+    expect(response.body.top_rated.name).toBe('Astra');
+  });
+
+  test('GET /api/items/compare rejects insufficient ids', async () => {
+    const response = await request(app).get('/api/items/compare?ids=2');
+
+    expect(response.statusCode).toBe(400);
+    expect(response.body.error).toMatch(/at least 2/i);
+  });
 });

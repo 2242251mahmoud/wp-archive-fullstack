@@ -8,6 +8,11 @@ A full-stack archive app that collects WordPress themes/plugins and presents the
 - Trending panel based on rating and download count
 - Pagination for large datasets
 - API health badge and retry flow in UI
+- Discovery Lab collections (Hidden Gems, Heavy Hitters, Fresh Finds)
+- Favorites Vault persisted in local storage
+- Compare Bench for side-by-side item comparison
+- One-click WP-CLI install command copy per item card
+- Insights panel with live archive statistics
 - Scheduled scraper with PostgreSQL persistence
 - Frontend and backend CI workflows on GitHub Actions
 - Backend Dockerfile and local `docker-compose` stack
@@ -169,6 +174,9 @@ API will be available at `http://localhost:5001`.
 - `GET /api/items?page=1&limit=50&search=&category=`
 - `GET /api/items/:id`
 - `GET /api/items/trending/items?limit=5`
+- `GET /api/items/collections?limit=6`
+- `GET /api/items/insights`
+- `GET /api/items/compare?ids=1,2`
 - `GET /api/categories`
 
 ## CI

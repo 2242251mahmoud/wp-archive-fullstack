@@ -1,4 +1,28 @@
-export default function ItemCard({ item }) {
+import { useState } from 'react';
+
+export default function ItemCard({
+  item,
+  isFavorite = false,
+  isCompared = false,
+  onToggleFavorite,
+  onToggleCompare
+}) {
+  const [copied, setCopied] = useState(false);
+
+  const slug = item.slug || item.name?.toLowerCase().replace(/\s+/g, '-');
+  const installType = item.category_id === 1 ? 'theme' : 'plugin';
+  const wpCliCommand = `wp ${installType} install ${slug} --activate`;
+
+  const handleCopyCommand = async () => {
+    try {
+      await navigator.clipboard.writeText(wpCliCommand);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1400);
+    } catch (err) {
+      console.error('Could not copy command', err);
+    }
+  };
+
   return (
     <div className="item-card">
       <div className="item-card-header">
@@ -14,6 +38,30 @@ export default function ItemCard({ item }) {
         </div>
       </div>
       <div className="item-card-footer">
+        <div className="card-action-row">
+          <button
+            type="button"
+            className={isFavorite ? 'btn-chip active' : 'btn-chip'}
+            onClick={() => onToggleFavorite?.(item)}
+          >
+            {isFavorite ? 'Saved' : 'Save'}
+          </button>
+          <button
+            type="button"
+            className={isCompared ? 'btn-chip active' : 'btn-chip'}
+            onClick={() => onToggleCompare?.(item)}
+          >
+            {isCompared ? 'In Compare' : 'Compare'}
+          </button>
+          <button
+            type="button"
+            className={copied ? 'btn-chip copied' : 'btn-chip'}
+            onClick={handleCopyCommand}
+            title="Copy WP-CLI install command"
+          >
+            {copied ? 'Copied' : 'WP-CLI'}
+          </button>
+        </div>
         <a
           href={item.download_link}
           target="_blank"

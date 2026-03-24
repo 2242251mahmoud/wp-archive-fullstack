@@ -19,7 +19,10 @@ function createApp() {
         health: '/api/health',
         items: '/api/items',
         categories: '/api/categories',
-        trending: '/api/items/trending/items'
+        trending: '/api/items/trending/items',
+        collections: '/api/items/collections',
+        insights: '/api/items/insights',
+        compare: '/api/items/compare?ids=1,2'
       }
     });
   });

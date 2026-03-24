@@ -72,6 +72,103 @@ router.get('/trending/items', async (req, res) => {
   }
 });
 
+// Get curated discovery collections
+router.get('/collections', async (req, res) => {
+  try {
+    const parsedLimit = parseInt(req.query.limit, 10);
+    const limit = Number.isFinite(parsedLimit) && parsedLimit > 0 ? parsedLimit : 6;
+
+    const [hiddenGems, heavyHitters, freshFinds] = await Promise.all([
+      query(
+        'SELECT * FROM items WHERE rating >= 4.5 ORDER BY download_count ASC NULLS LAST, rating DESC LIMIT $1',
+        [limit]
+      ),
+      query(
+        'SELECT * FROM items ORDER BY download_count DESC NULLS LAST, rating DESC LIMIT $1',
+        [limit]
+      ),
+      query(
+        'SELECT * FROM items ORDER BY updated_at DESC NULLS LAST, rating DESC LIMIT $1',
+        [limit]
+      )
+    ]);
+
+    res.json({
+      hidden_gems: hiddenGems.rows,
+      heavy_hitters: heavyHitters.rows,
+      fresh_finds: freshFinds.rows
+    });
+  } catch (err) {
+    console.error('Error fetching collections:', err);
+    res.status(500).json({ error: 'Failed to fetch collections' });
+  }
+});
+
+// Get archive insights for dashboard cards
+router.get('/insights', async (req, res) => {
+  try {
+    const [statsResult, topCategoryResult, topRatedResult] = await Promise.all([
+      query(
+        `SELECT
+          COUNT(*)::int AS total_items,
+          COALESCE(AVG(rating), 0)::numeric(10,2) AS avg_rating,
+          COALESCE(MAX(download_count), 0)::int AS max_download_count
+         FROM items`
+      ),
+      query(
+        `SELECT c.name, COUNT(i.id)::int AS item_count
+         FROM categories c
+         LEFT JOIN items i ON i.category_id = c.id
+         GROUP BY c.name
+         ORDER BY item_count DESC, c.name ASC
+         LIMIT 1`
+      ),
+      query(
+        `SELECT name, rating, download_count
+         FROM items
+         ORDER BY rating DESC NULLS LAST, download_count DESC NULLS LAST
+         LIMIT 1`
+      )
+    ]);
+
+    res.json({
+      stats: statsResult.rows[0] || { total_items: 0, avg_rating: 0, max_download_count: 0 },
+      top_category: topCategoryResult.rows[0] || null,
+      top_rated: topRatedResult.rows[0] || null
+    });
+  } catch (err) {
+    console.error('Error fetching insights:', err);
+    res.status(500).json({ error: 'Failed to fetch insights' });
+  }
+});
+
+// Compare up to 3 items by ids query parameter
+router.get('/compare', async (req, res) => {
+  try {
+    const idsParam = (req.query.ids || '').toString();
+    const ids = idsParam
+      .split(',')
+      .map((id) => parseInt(id, 10))
+      .filter((id) => Number.isFinite(id));
+
+    if (ids.length < 2) {
+      return res.status(400).json({ error: 'Provide at least 2 valid item ids in ids query parameter' });
+    }
+
+    const uniqueIds = [...new Set(ids)].slice(0, 3);
+    const placeholders = uniqueIds.map((_, i) => `$${i + 1}`).join(', ');
+    const result = await query(
+      `SELECT * FROM items WHERE id IN (${placeholders}) ORDER BY rating DESC NULLS LAST, download_count DESC NULLS LAST`,
+      uniqueIds
+    );
+
+    res.json({ items: result.rows });
+  } catch (err) {
+    console.error('Error comparing items:', err);
+    res.status(500).json({ error: 'Failed to compare items' });
+  }
+});
+
 // Get single item
 router.get('/:id', async (req, res) => {
   try {
