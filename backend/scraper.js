@@ -51,7 +51,7 @@ const scrapeThemes = async () => {
             // Get or create category
             let categoryId = 1; // Default category
 
-            const result = await query(
+            await query(
               `INSERT INTO items (name, slug, description, author, category_id, rating, download_link, created_at, updated_at)
                VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW())
                ON CONFLICT (slug) DO UPDATE SET
@@ -66,7 +66,7 @@ const scrapeThemes = async () => {
                 theme.link
               ]
             );
-          } catch (err) {
+          } catch {
             // Ignore duplicate or error
           }
         }
@@ -125,7 +125,7 @@ const scrapePlugins = async () => {
           try {
             let categoryId = 2; // Default category for plugins
 
-            const result = await query(
+            await query(
               `INSERT INTO items (name, slug, description, author, category_id, rating, download_link, created_at, updated_at)
                VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW())
                ON CONFLICT (slug) DO UPDATE SET
@@ -140,7 +140,7 @@ const scrapePlugins = async () => {
                 plugin.link
               ]
             );
-          } catch (err) {
+          } catch {
             // Ignore duplicate or error
           }
         }

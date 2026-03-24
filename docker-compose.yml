@@ -1,0 +1,36 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: wp-archive-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: wp_archive
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend
+    container_name: wp-archive-api
+    depends_on:
+      - db
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 5001
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: wp_archive
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+    ports:
+      - "5001:5001"
+
+volumes:
+  pg_data:

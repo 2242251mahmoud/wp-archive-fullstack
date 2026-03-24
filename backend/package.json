@@ -6,6 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
+    "lint": "eslint . --max-warnings=0",
+    "check": "node --check app.js && node --check server.js && node --check routes/items.js && node --check routes/categories.js",
     "test": "NODE_ENV=test jest --runInBand",
     "test:watch": "NODE_ENV=test jest --watch"
   },
@@ -24,6 +26,9 @@
     "pg": "^8.20.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "eslint": "^9.39.1",
+    "globals": "^16.5.0",
     "jest": "^30.2.0",
     "supertest": "^7.1.4"
   }

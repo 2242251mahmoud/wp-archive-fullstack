@@ -10,6 +10,9 @@ A full-stack archive app that collects WordPress themes/plugins and presents the
 - API health badge and retry flow in UI
 - Scheduled scraper with PostgreSQL persistence
 - Frontend and backend CI workflows on GitHub Actions
+- Backend Dockerfile and local `docker-compose` stack
+- PR/Issue templates and CODEOWNERS for better collaboration
+- Security policy and Dependabot update automation
 
 ## Stack
 
@@ -33,6 +36,7 @@ wp-archive/
 │   ├── server.js
 │   ├── db.js
 │   ├── scraper.js
+│   ├── Dockerfile
 │   ├── seed.js
 │   ├── seed-items.js
 │   ├── tests/
@@ -50,7 +54,13 @@ wp-archive/
 │   └── vercel.json
 ├── .github/workflows/frontend-ci.yml
 ├── .github/workflows/backend-ci.yml
-└── render.yaml
+├── .github/pull_request_template.md
+├── .github/ISSUE_TEMPLATE/
+├── .github/CODEOWNERS
+├── .github/SECURITY.md
+├── .github/dependabot.yml
+├── render.yaml
+└── docker-compose.yml
 ```
 
 ## Environment Variables
@@ -132,6 +142,22 @@ cd backend
 npm test
 ```
 
+### 7. Run backend lint and syntax checks
+
+```bash
+cd backend
+npm run lint
+npm run check
+```
+
+### 8. Run backend with Docker (optional)
+
+```bash
+docker compose up --build
+```
+
+API will be available at `http://localhost:5001`.
+
 ## API Endpoints
 
 - `GET /api`
@@ -152,6 +178,8 @@ Frontend workflow `.github/workflows/frontend-ci.yml` runs on push/PR for fronte
 Backend workflow `.github/workflows/backend-ci.yml` runs on push/PR for backend changes:
 
 - `npm ci`
+- `npm run lint`
+- `npm run check`
 - `npm test`
 
 ## Deployment
@@ -173,6 +201,8 @@ npm start
 ```text
 GET /api/health
 ```
+
+If deploying with Docker, use `backend/Dockerfile`.
 
 ### Frontend Deployment (Vercel/Netlify)
 
@@ -214,3 +244,14 @@ VITE_API_URL=https://your-backend-domain/api
 ## License
 
 MIT
+
+## Collaboration Defaults
+
+- Pull requests use `.github/pull_request_template.md`
+- Issues use `.github/ISSUE_TEMPLATE/*`
+- Owners are defined in `.github/CODEOWNERS`
+
+## Security and Maintenance
+
+- Vulnerability reporting policy: `.github/SECURITY.md`
+- Automated dependency updates: `.github/dependabot.yml`
