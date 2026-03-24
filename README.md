@@ -1,238 +1,194 @@
-# WordPress Archive - Web Scraping & Data Display
+# WordPress Archive
 
-A full-stack web application that scrapes WordPress themes and plugins from WordPress.org and displays them in a modern, searchable interface - similar to wplocker.com.
+A full-stack archive app that collects WordPress themes/plugins and presents them in a searchable interface with category filters, trending highlights, pagination, sorting, and backend health visibility.
 
-## Features
+## Highlights
 
-- 🔍 **Search & Filter**: Search themes and plugins with real-time filtering
-- 📂 **Category Browse**: Browse content by category
-- 📊 **Trending Section**: Discover trending themes and plugins
-- ⚡ **Fast & Responsive**: Built with React and Express for optimal performance
-- 🗄️ **Database Storage**: PostgreSQL for reliable data persistence
-- 🤖 **Automatic Scraping**: Scheduled scraper collects data from WordPress.org weekly
+- Search and category filtering
+- Trending panel based on rating and download count
+- Pagination for large datasets
+- API health badge and retry flow in UI
+- Scheduled scraper with PostgreSQL persistence
+- Frontend CI workflow (lint + build) on GitHub Actions
 
-## Tech Stack
+## Stack
 
 ### Backend
-- **Node.js + Express** - API server
-- **PostgreSQL** - Database
-- **Cheerio** - Web scraping
-- **Node-cron** - Scheduled tasks
-- **Axios** - HTTP requests
+- Node.js
+- Express
+- PostgreSQL (`pg`)
+- Cheerio + Axios
+- node-cron
 
 ### Frontend
-- **React 18** - UI framework
-- **Vite** - Build tool
-- **CSS** - Styling
+- React + Vite
+- Plain CSS with responsive layout
 
 ## Project Structure
 
-```
+```text
 wp-archive/
 ├── backend/
-│   ├── server.js          # Main server file
-│   ├── db.js              # Database setup and queries
-│   ├── scraper.js         # WordPress.org scraper
+│   ├── server.js
+│   ├── db.js
+│   ├── scraper.js
+│   ├── seed.js
+│   ├── seed-items.js
 │   ├── routes/
-│   │   ├── items.js       # Items API endpoints
-│   │   └── categories.js  # Categories API endpoints
-│   ├── package.json
-│   └── .env               # Environment variables
-└── frontend/
-    ├── src/
-    │   ├── App.jsx        # Main app component
-    │   ├── App.css        # Styles
-    │   ├── components/
-    │   │   ├── ItemCard.jsx
-    │   │   ├── SearchBar.jsx
-    │   │   ├── Pagination.jsx
-    │   │   └── Sidebar.jsx
-    │   └── main.jsx
-    └── package.json
+│   │   ├── items.js
+│   │   └── categories.js
+│   └── .env.example
+├── frontend/
+│   ├── src/
+│   │   ├── App.jsx
+│   │   ├── App.css
+│   │   └── components/
+│   └── .env.example
+└── .github/workflows/frontend-ci.yml
 ```
 
-## Setup Instructions
+## Environment Variables
 
-### Prerequisites
-- Node.js 16+
-- PostgreSQL 12+
-- Homebrew (for macOS) or your OS package manager
+### Backend (`backend/.env`)
 
-### 1. Install PostgreSQL
+Copy `backend/.env.example` to `backend/.env`.
 
-**macOS (Homebrew)**
-```bash
-brew install postgresql
-brew services start postgresql
-```
-
-**Linux (Ubuntu/Debian)**
-```bash
-sudo apt-get install postgresql postgresql-contrib
-sudo service postgresql start
-```
-
-**Windows**
-Download and install from [postgresql.org](https://www.postgresql.org/download/windows/)
-
-### 2. Create Database
-
-```bash
-createdb wp_archive
-
-# Or using psql:
-psql -U postgres
-CREATE DATABASE wp_archive;
-\q
-```
-
-### 3. Backend Setup
-
-```bash
-cd backend
-npm install
-```
-
-Update `.env` if needed:
-```
-PORT=5000
+```env
+PORT=5001
 DB_USER=postgres
 DB_PASSWORD=password
 DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=wp_archive
+NODE_ENV=development
 ```
 
-Start the backend:
+### Frontend (`frontend/.env`)
+
+Copy `frontend/.env.example` to `frontend/.env`.
+
+```env
+VITE_API_URL=http://localhost:5001/api
+```
+
+## Local Development
+
+### 1. Install dependencies
+
 ```bash
-npm start
+cd backend && npm install
+cd ../frontend && npm install
 ```
 
-The server will run on `http://localhost:5000`
-
-### 4. Frontend Setup
+### 2. Create database
 
 ```bash
-cd frontend
-npm install
-npm run dev
+createdb wp_archive
 ```
 
-The app will be available at `http://localhost:5173`
+### 3. Configure env files
 
-## Usage
+Create:
+- `backend/.env`
+- `frontend/.env`
 
-1. **Home Page**: Browse all themes and plugins
-2. **Search**: Use the search bar to find specific items
-3. **Filter by Category**: Click categories in the sidebar
-4. **Pagination**: Navigate through pages of results
-5. **Trending**: View trending items in the sidebar
+### 4. Seed sample data (optional)
 
-## API Endpoints
+```bash
+cd backend
+node seed.js
+node seed-items.js
+```
 
-### Items
-- `GET /api/items` - List items with pagination
-  - Query params: `page`, `limit`, `search`, `category`
-- `GET /api/items/:id` - Get single item
-- `GET /api/items/trending/items` - Get trending items
-  - Query params: `limit`
+### 5. Start apps
 
-### Categories
-- `GET /api/categories` - List all categories with item counts
+Terminal 1:
 
-## Database Schema
-
-### Tables
-
-**categories**
-- `id` (PRIMARY KEY)
-- `name` (VARCHAR, UNIQUE)
-- `type` (VARCHAR)
-- `created_at` (TIMESTAMP)
-
-**items**
-- `id` (PRIMARY KEY)
-- `name` (VARCHAR)
-- `slug` (VARCHAR, UNIQUE)
-- `description` (TEXT)
-- `author` (VARCHAR)
-- `category_id` (FOREIGN KEY)
-- `version` (VARCHAR)
-- `rating` (DECIMAL)
-- `download_count` (INTEGER)
-- `download_link` (VARCHAR)
-- `created_at` (TIMESTAMP)
-- `updated_at` (TIMESTAMP)
-
-## Scraper
-
-The scraper automatically:
-- Fetches themes from `https://wordpress.org/themes/`
-- Fetches plugins from `https://wordpress.org/plugins/`
-- Runs on startup and then weekly (Sunday at 2 AM)
-- Stores data in the database
-- Updates existing items if already in database
-
-## Development
-
-### Running Locally
-
-Terminal 1 (Backend):
 ```bash
 cd backend
 npm start
 ```
 
-Terminal 2 (Frontend):
+Terminal 2:
+
 ```bash
 cd frontend
 npm run dev
 ```
 
-### Building for Production
+Frontend: `http://localhost:5173`
+Backend: `http://localhost:5001`
 
-Backend:
+## API Endpoints
+
+- `GET /api`
+- `GET /api/health`
+- `GET /api/items?page=1&limit=50&search=&category=`
+- `GET /api/items/:id`
+- `GET /api/items/trending/items?limit=5`
+- `GET /api/categories`
+
+## CI
+
+GitHub Actions workflow at `.github/workflows/frontend-ci.yml` runs on push/PR for frontend changes:
+
+- `npm ci`
+- `npm run lint`
+- `npm run build`
+
+## Deployment
+
+### Backend Deployment (Render/Railway/Fly.io/VM)
+
+1. Provision PostgreSQL.
+2. Set backend env variables from `backend/.env.example`.
+3. Run backend service with:
+
 ```bash
-# No build needed, run with: npm start
+npm start
 ```
 
-Frontend:
+4. Confirm health endpoint:
+
+```text
+GET /api/health
+```
+
+### Frontend Deployment (Vercel/Netlify)
+
+1. Set root to `frontend`.
+2. Build command:
+
 ```bash
-cd frontend
 npm run build
 ```
 
-## Future Enhancements
+3. Output directory:
 
-- User accounts and authentication
-- Comment system
-- Download tracking
-- Admin panel for scraper management
-- Support for more sources (ThemeForest, CodeCanyon, etc.)
-- Favorites/bookmarks
-- Advanced filtering options
+```text
+dist
+```
+
+4. Set env variable:
+
+```text
+VITE_API_URL=https://your-backend-domain/api
+```
 
 ## Troubleshooting
 
-### Database Connection Error
-- Ensure PostgreSQL is running: `brew services start postgresql`
-- Check `.env` credentials match your PostgreSQL setup
-- Verify database exists: `psql -l`
+### "Cannot GET /api"
 
-### Scraper Not Working
-- Check internet connection
-- Verify WordPress.org is accessible
-- Check backend logs for errors
+- Ensure backend process is restarted after code changes.
+- Confirm backend runs on expected port (`5001` by default).
+- Check `frontend/.env` points to correct API base URL.
 
-### Frontend Can't Connect to Backend
-- Ensure backend is running on `http://localhost:5000`
-- Check CORS is enabled in `server.js`
-- Verify no port conflicts
+### Frontend can not load items
+
+- Confirm backend health: `GET /api/health`
+- Verify CORS middleware is enabled in backend
+- Ensure database credentials are valid
 
 ## License
 
 MIT
-
-## Notes
-
-This is a learning project that demonstrates web scraping, full-stack development, and data aggregation. It respects WordPress.org's public content and robots.txt policies.

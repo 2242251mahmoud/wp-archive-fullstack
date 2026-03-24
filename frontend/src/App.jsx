@@ -16,6 +16,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [apiStatus, setApiStatus] = useState('checking');
+  const [sortBy, setSortBy] = useState('updated');
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
@@ -110,6 +111,34 @@ function App() {
     fetchTrending();
   };
 
+  const getSortedItems = () => {
+    const list = [...items];
+
+    if (sortBy === 'rating') {
+      return list.sort((a, b) => Number(b.rating || 0) - Number(a.rating || 0));
+    }
+
+    if (sortBy === 'downloads') {
+      return list.sort((a, b) => Number(b.download_count || 0) - Number(a.download_count || 0));
+    }
+
+    if (sortBy === 'name-asc') {
+      return list.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+    }
+
+    if (sortBy === 'name-desc') {
+      return list.sort((a, b) => (b.name || '').localeCompare(a.name || ''));
+    }
+
+    return list;
+  };
+
+  const sortedItems = getSortedItems();
+  const totalItems = pagination.total || 0;
+  const categoryLabel = selectedCategory === 'all'
+    ? 'All categories'
+    : categories.find((cat) => cat.id === selectedCategory)?.name || 'Filtered category';
+
   const handleSearch = (value) => {
     setSearch(value);
     setPage(1);
@@ -140,7 +169,7 @@ function App() {
               API {apiStatus}
             </button>
           </div>
-          <p>Browse thousands of WordPress themes and plugins</p>
+          <p>Curated discovery for WordPress themes and plugins</p>
         </div>
       </header>
 
@@ -157,6 +186,30 @@ function App() {
         <main className="main">
           <SearchBar value={search} onChange={handleSearch} />
 
+          <section className="toolbar" aria-label="Results controls">
+            <div className="stats-row">
+              <span className="stat-pill">{totalItems.toLocaleString()} items</span>
+              <span className="stat-pill">{categories.length} categories</span>
+              <span className="stat-pill">{categoryLabel}</span>
+            </div>
+
+            <label className="sort-wrap" htmlFor="sortBy">
+              Sort by
+              <select
+                id="sortBy"
+                className="sort-select"
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+              >
+                <option value="updated">Recently updated</option>
+                <option value="rating">Top rated</option>
+                <option value="downloads">Most downloaded</option>
+                <option value="name-asc">Name A-Z</option>
+                <option value="name-desc">Name Z-A</option>
+              </select>
+            </label>
+          </section>
+
           {error ? (
             <div className="error-message">
               <p>{error}</p>
@@ -171,7 +224,7 @@ function App() {
           ) : (
             <>
               <div className="items-grid">
-                {items.map((item) => (
+                {sortedItems.map((item) => (
                   <ItemCard key={item.id} item={item} />
                 ))}
               </div>
