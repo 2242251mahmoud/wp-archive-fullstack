@@ -61,6 +61,8 @@ wp-archive/
 ├── .github/dependabot.yml
 ├── .github/branch-protection.md
 ├── .github/workflows/release-on-version-bump.yml
+├── .github/workflows/pr-title.yml
+├── .github/workflows/dependency-review.yml
 ├── render.yaml
 └── docker-compose.yml
 ```
@@ -189,6 +191,10 @@ Release workflow `.github/workflows/release-on-version-bump.yml` runs on push to
 - Reads `version`
 - Creates tag `v<version>` if it does not already exist
 - Publishes a GitHub release with auto-generated release notes
+
+PR title workflow `.github/workflows/pr-title.yml` enforces conventional commit style pull request titles.
+
+Dependency review workflow `.github/workflows/dependency-review.yml` scans dependency diffs on pull requests.
 
 ## Deployment
 
