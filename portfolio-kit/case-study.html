@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WordPress Archive - Case Study</title>
+  <meta name="description" content="Portfolio case study of a recommendation-driven WordPress discovery platform." />
+  <style>
+    :root {
+      --ink: #1d1a17;
+      --muted: #5a534d;
+      --paper: #fffdf8;
+      --line: rgba(40, 33, 26, 0.14);
+      --teal: #0f766e;
+      --amber: #c67f24;
+      --card: rgba(255, 255, 255, 0.82);
+      --shadow: 0 16px 34px rgba(21, 17, 13, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Space Grotesk", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(780px 400px at 95% -20%, rgba(15, 118, 110, 0.18), transparent 65%),
+        radial-gradient(660px 300px at -10% 15%, rgba(198, 127, 36, 0.18), transparent 64%),
+        linear-gradient(180deg, #f7f2e7 0%, #efe7d9 100%);
+    }
+
+    .wrap {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 28px 18px 48px;
+    }
+
+    .hero,
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--card);
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      padding: 24px;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(2rem, 4vw, 3rem);
+      letter-spacing: -0.02em;
+      line-height: 1.05;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      max-width: 72ch;
+      font-size: 1.04rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .card {
+      padding: 16px;
+    }
+
+    .card h2 {
+      margin: 0 0 8px;
+      font-size: 1.1rem;
+      letter-spacing: 0.01em;
+    }
+
+    .span-6 { grid-column: span 6; }
+    .span-12 { grid-column: span 12; }
+
+    ul {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .tag {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #2f2824;
+      background: rgba(255, 255, 255, 0.72);
+    }
+
+    .cta {
+      margin-top: 12px;
+      display: inline-block;
+      color: #fff;
+      background: var(--teal);
+      text-decoration: none;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-weight: 700;
+      font-size: 0.92rem;
+    }
+
+    .small {
+      font-size: 0.88rem;
+      color: #6c635d;
+    }
+
+    @media (max-width: 840px) {
+      .span-6 { grid-column: span 12; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="hero">
+      <h1>WordPress Archive</h1>
+      <p class="subtitle">A recommendation-driven discovery platform for WordPress themes and plugins, built to reduce decision fatigue and speed up practical implementation.</p>
+      <div class="tag-row">
+        <span class="tag">React</span>
+        <span class="tag">Express</span>
+        <span class="tag">PostgreSQL</span>
+        <span class="tag">Recommendation Scoring</span>
+        <span class="tag">CI + Tests</span>
+      </div>
+      <a class="cta" href="https://github.com/2242251mahmoud/wp-archive-fullstack" target="_blank" rel="noopener noreferrer">View Repository</a>
+    </section>
+
+    <section class="grid">
+      <article class="card span-6">
+        <h2>Problem</h2>
+        <p>Directory-style browsing makes plugin/theme selection slow and overwhelming. Users need guided decision support, not endless lists.</p>
+      </article>
+
+      <article class="card span-6">
+        <h2>Solution</h2>
+        <p>Built product workflows: Recommendation Radar, Discovery Lab collections, Stack Builder by goal, Compare Bench, Favorites Vault, and shareable snapshots.</p>
+      </article>
+
+      <article class="card span-6">
+        <h2>Key Product Features</h2>
+        <ul>
+          <li>Recommendation score blending quality, popularity, freshness</li>
+          <li>Goal-based stack generation (SEO, ecommerce, performance, security)</li>
+          <li>One-click WP-CLI copy actions on each card</li>
+          <li>Share links for favorites and comparison state</li>
+        </ul>
+      </article>
+
+      <article class="card span-6">
+        <h2>Engineering Depth</h2>
+        <ul>
+          <li>Backend/frontend CI pipelines</li>
+          <li>Integration tests with Jest + Supertest</li>
+          <li>Branch protection + CODEOWNERS</li>
+          <li>Release workflow and security automation</li>
+          <li>Docker + deploy configs (Render/Vercel)</li>
+        </ul>
+      </article>
+
+      <article class="card span-12">
+        <h2>Portfolio Narrative</h2>
+        <p>This project demonstrates product thinking plus production engineering: I translated a discovery pain point into a full-stack, recommendation-based experience with measurable UX value and maintainable operational workflows.</p>
+        <p class="small" style="margin-top:10px;">Use this page directly in your personal site or adapt content from portfolio-kit/case-study.md and portfolio-kit/site-copy.md.</p>
+      </article>
+    </section>
+  </main>
+</body>
+</html>

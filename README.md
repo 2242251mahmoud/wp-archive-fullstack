@@ -283,3 +283,14 @@ MIT
 
 - Vulnerability reporting policy: `.github/SECURITY.md`
 - Automated dependency updates: `.github/dependabot.yml`
+
+## Portfolio Kit
+
+Use these ready-made assets to showcase this project on your personal website:
+
+- `portfolio-kit/case-study.md` - long-form narrative case study
+- `portfolio-kit/site-copy.md` - short/medium copy blocks, SEO text, CTAs
+- `portfolio-kit/project-data.json` - structured project metadata for dynamic site rendering
+- `portfolio-kit/case-study.html` - standalone polished case study web page
+- `PORTFOLIO_CASE_STUDY.md` - expanded engineering + product storytelling
+- `PORTFOLIO_SNIPPETS.md` - resume and project card snippets

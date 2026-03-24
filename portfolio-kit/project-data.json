@@ -1,0 +1,24 @@
+{
+  "name": "WordPress Archive",
+  "slug": "wordpress-archive",
+  "tagline": "Recommendation-driven discovery for WordPress themes and plugins",
+  "stack": ["React", "Vite", "Node.js", "Express", "PostgreSQL", "Jest", "GitHub Actions"],
+  "highlights": [
+    "Discovery Lab collections",
+    "Recommendation Radar scoring",
+    "Goal-based Stack Builder",
+    "Compare Bench and Favorites Vault",
+    "Shareable snapshot links",
+    "WP-CLI quick copy actions"
+  ],
+  "engineering": [
+    "Backend and frontend CI",
+    "Integration tests (Jest + Supertest)",
+    "Branch protection and CODEOWNERS",
+    "Release workflow on version bump",
+    "Dependabot and security policy",
+    "Docker and deployment configs"
+  ],
+  "repoUrl": "https://github.com/2242251mahmoud/wp-archive-fullstack",
+  "caseStudyPath": "portfolio-kit/case-study.md"
+}
