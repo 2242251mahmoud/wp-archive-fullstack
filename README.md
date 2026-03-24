@@ -59,6 +59,8 @@ wp-archive/
 ├── .github/CODEOWNERS
 ├── .github/SECURITY.md
 ├── .github/dependabot.yml
+├── .github/branch-protection.md
+├── .github/workflows/release-on-version-bump.yml
 ├── render.yaml
 └── docker-compose.yml
 ```
@@ -182,6 +184,12 @@ Backend workflow `.github/workflows/backend-ci.yml` runs on push/PR for backend 
 - `npm run check`
 - `npm test`
 
+Release workflow `.github/workflows/release-on-version-bump.yml` runs on push to `main` when root `package.json` changes:
+
+- Reads `version`
+- Creates tag `v<version>` if it does not already exist
+- Publishes a GitHub release with auto-generated release notes
+
 ## Deployment
 
 ### Backend Deployment (Render/Railway/Fly.io/VM)
@@ -250,6 +258,7 @@ MIT
 - Pull requests use `.github/pull_request_template.md`
 - Issues use `.github/ISSUE_TEMPLATE/*`
 - Owners are defined in `.github/CODEOWNERS`
+- Main branch protection policy is documented in `.github/branch-protection.md`
 
 ## Security and Maintenance
 
