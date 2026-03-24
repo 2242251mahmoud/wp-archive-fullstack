@@ -26,11 +26,13 @@ function App() {
     fetchItems();
     fetchCategories();
     fetchTrending();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Fetch items on page/search/category change
   useEffect(() => {
     fetchItems();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, search, selectedCategory]);
 
   const checkApiStatus = async () => {
