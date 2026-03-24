@@ -14,6 +14,7 @@ function App() {
     fresh_finds: []
   });
   const [insights, setInsights] = useState(null);
+  const [recommendations, setRecommendations] = useState([]);
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -34,6 +35,9 @@ function App() {
   });
   const [compareItems, setCompareItems] = useState([]);
   const [compareData, setCompareData] = useState([]);
+  const [stackGoal, setStackGoal] = useState('launch-fast');
+  const [stackItems, setStackItems] = useState([]);
+  const [shareCopied, setShareCopied] = useState(false);
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
@@ -44,6 +48,8 @@ function App() {
     fetchTrending();
     fetchCollections();
     fetchInsights();
+    fetchRecommendations();
+    fetchStack('launch-fast');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -163,6 +169,32 @@ function App() {
     }
   };
 
+  const fetchRecommendations = async () => {
+    try {
+      const response = await fetch(`${API_URL}/items/recommendations?limit=8`);
+      if (!response.ok) {
+        throw new Error('Failed to load recommendations');
+      }
+      const data = await response.json();
+      setRecommendations(data);
+    } catch (err) {
+      console.error('Error fetching recommendations:', err);
+    }
+  };
+
+  const fetchStack = async (goal) => {
+    try {
+      const response = await fetch(`${API_URL}/items/stack?goal=${encodeURIComponent(goal)}`);
+      if (!response.ok) {
+        throw new Error('Failed to build stack');
+      }
+      const data = await response.json();
+      setStackItems(data.items || []);
+    } catch (err) {
+      console.error('Error fetching stack:', err);
+    }
+  };
+
   const fetchCompare = async (ids) => {
     try {
       const response = await fetch(`${API_URL}/items/compare?ids=${ids.join(',')}`);
@@ -184,6 +216,34 @@ function App() {
     fetchTrending();
     fetchCollections();
     fetchInsights();
+    fetchRecommendations();
+    fetchStack(stackGoal);
+  };
+
+  const copyShareSnapshot = async () => {
+    const url = new URL(window.location.href);
+    const compareIds = compareItems.map((item) => item.id).join(',');
+    const favoriteParam = favoriteIds.join(',');
+
+    if (favoriteParam) {
+      url.searchParams.set('fav', favoriteParam);
+    } else {
+      url.searchParams.delete('fav');
+    }
+
+    if (compareIds) {
+      url.searchParams.set('cmp', compareIds);
+    } else {
+      url.searchParams.delete('cmp');
+    }
+
+    try {
+      await navigator.clipboard.writeText(url.toString());
+      setShareCopied(true);
+      setTimeout(() => setShareCopied(false), 1400);
+    } catch (err) {
+      console.error('Failed to copy share snapshot:', err);
+    }
   };
 
   const toggleFavorite = (item) => {
@@ -242,14 +302,16 @@ function App() {
       ...(collections.hidden_gems || []),
       ...(collections.heavy_hitters || []),
       ...(collections.fresh_finds || []),
-      ...compareItems
+      ...compareItems,
+      ...recommendations,
+      ...stackItems
     ];
 
     return all.reduce((acc, item) => {
       acc[item.id] = item;
       return acc;
     }, {});
-  }, [items, trending, collections, compareItems]);
+  }, [items, trending, collections, compareItems, recommendations, stackItems]);
 
   const favoriteItems = favoriteIds.map((id) => itemLookup[id]).filter(Boolean);
   const activeCollectionItems = collections[activeCollection] || [];
@@ -311,6 +373,13 @@ function App() {
               <span className="stat-pill">{categories.length} categories</span>
               <span className="stat-pill">{categoryLabel}</span>
               <span className="stat-pill">{favoriteIds.length} saved</span>
+              <button
+                type="button"
+                className={shareCopied ? 'stat-pill button-pill copied' : 'stat-pill button-pill'}
+                onClick={copyShareSnapshot}
+              >
+                {shareCopied ? 'Snapshot Copied' : 'Share Snapshot'}
+              </button>
             </div>
 
             <label className="sort-wrap" htmlFor="sortBy">
@@ -328,6 +397,60 @@ function App() {
                 <option value="name-desc">Name Z-A</option>
               </select>
             </label>
+          </section>
+
+          <section className="recommendation-radar">
+            <div className="section-head">
+              <h3>Recommendation Radar</h3>
+              <span className="vault-count">Quality + popularity + freshness blend</span>
+            </div>
+            <div className="collection-grid">
+              {recommendations.map((item) => (
+                <ItemCard
+                  key={`recommend-${item.id}`}
+                  item={item}
+                  isFavorite={favoriteIds.includes(item.id)}
+                  isCompared={compareItems.some((entry) => entry.id === item.id)}
+                  onToggleFavorite={toggleFavorite}
+                  onToggleCompare={toggleCompare}
+                />
+              ))}
+            </div>
+          </section>
+
+          <section className="stack-builder">
+            <div className="section-head">
+              <h3>Build My Stack</h3>
+              <div className="stack-controls">
+                <select
+                  className="sort-select"
+                  value={stackGoal}
+                  onChange={(e) => setStackGoal(e.target.value)}
+                >
+                  <option value="launch-fast">Launch Fast</option>
+                  <option value="seo">SEO</option>
+                  <option value="ecommerce">Ecommerce</option>
+                  <option value="performance">Performance</option>
+                  <option value="security">Security</option>
+                  <option value="blog">Blog</option>
+                </select>
+                <button type="button" className="switch-btn active" onClick={() => fetchStack(stackGoal)}>
+                  Generate
+                </button>
+              </div>
+            </div>
+            <div className="collection-grid">
+              {stackItems.map((item) => (
+                <ItemCard
+                  key={`stack-${item.id}`}
+                  item={item}
+                  isFavorite={favoriteIds.includes(item.id)}
+                  isCompared={compareItems.some((entry) => entry.id === item.id)}
+                  onToggleFavorite={toggleFavorite}
+                  onToggleCompare={toggleCompare}
+                />
+              ))}
+            </div>
           </section>
 
           <section className="insights-panel">

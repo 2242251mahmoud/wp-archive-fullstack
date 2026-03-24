@@ -122,4 +122,28 @@ describe('Items and categories API integration', () => {
     expect(response.statusCode).toBe(400);
     expect(response.body.error).toMatch(/at least 2/i);
   });
+
+  test('GET /api/items/recommendations returns scored results', async () => {
+    query.mockResolvedValueOnce({
+      rows: [{ id: 32, name: 'Recommendation Item', recommendation_score: 4.321 }]
+    });
+
+    const response = await request(app).get('/api/items/recommendations?limit=3');
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toHaveLength(1);
+    expect(response.body[0].recommendation_score).toBe(4.321);
+  });
+
+  test('GET /api/items/stack returns goal-based items', async () => {
+    query.mockResolvedValueOnce({
+      rows: [{ id: 44, name: 'Stack Candidate', stack_score: 4.112 }]
+    });
+
+    const response = await request(app).get('/api/items/stack?goal=seo');
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body.goal).toBe('seo');
+    expect(response.body.items).toHaveLength(1);
+  });
 });

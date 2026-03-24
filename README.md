@@ -13,6 +13,9 @@ A full-stack archive app that collects WordPress themes/plugins and presents the
 - Compare Bench for side-by-side item comparison
 - One-click WP-CLI install command copy per item card
 - Insights panel with live archive statistics
+- Recommendation Radar endpoint and UI section
+- Goal-driven Stack Builder for common site outcomes
+- Shareable snapshot links for favorites and compare selections
 - Scheduled scraper with PostgreSQL persistence
 - Frontend and backend CI workflows on GitHub Actions
 - Backend Dockerfile and local `docker-compose` stack
@@ -176,6 +179,8 @@ API will be available at `http://localhost:5001`.
 - `GET /api/items/trending/items?limit=5`
 - `GET /api/items/collections?limit=6`
 - `GET /api/items/insights`
+- `GET /api/items/recommendations?limit=8`
+- `GET /api/items/stack?goal=seo`
 - `GET /api/items/compare?ids=1,2`
 - `GET /api/categories`
 

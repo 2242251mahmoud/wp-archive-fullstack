@@ -22,6 +22,8 @@ function createApp() {
         trending: '/api/items/trending/items',
         collections: '/api/items/collections',
         insights: '/api/items/insights',
+        recommendations: '/api/items/recommendations',
+        stack: '/api/items/stack?goal=seo',
         compare: '/api/items/compare?ids=1,2'
       }
     });

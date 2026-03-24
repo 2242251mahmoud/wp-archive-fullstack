@@ -142,6 +142,81 @@ router.get('/insights', async (req, res) => {
   }
 });
 
+// Get recommendation-ranked items using blended quality/popularity/freshness score
+router.get('/recommendations', async (req, res) => {
+  try {
+    const parsedLimit = parseInt(req.query.limit, 10);
+    const limit = Number.isFinite(parsedLimit) && parsedLimit > 0 ? parsedLimit : 12;
+
+    const result = await query(
+      `SELECT
+         i.*,
+         ROUND(
+           (
+             COALESCE(i.rating, 0) * 0.58 +
+             LEAST(COALESCE(i.download_count, 0) / 100000.0, 5) * 0.27 +
+             CASE
+               WHEN i.updated_at >= NOW() - INTERVAL '90 days' THEN 0.9
+               WHEN i.updated_at >= NOW() - INTERVAL '180 days' THEN 0.55
+               ELSE 0.2
+             END * 0.15
+           )::numeric,
+           3
+         ) AS recommendation_score
+       FROM items i
+       ORDER BY recommendation_score DESC, i.rating DESC NULLS LAST, i.download_count DESC NULLS LAST
+       LIMIT $1`,
+      [limit]
+    );
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Error fetching recommendations:', err);
+    res.status(500).json({ error: 'Failed to fetch recommendations' });
+  }
+});
+
+// Build a practical stack by goal keyword
+router.get('/stack', async (req, res) => {
+  try {
+    const goal = (req.query.goal || 'launch-fast').toString().toLowerCase();
+    const goalPatterns = {
+      seo: ['seo', 'rank', 'metadata', 'schema'],
+      ecommerce: ['commerce', 'checkout', 'cart', 'payment', 'shop'],
+      performance: ['cache', 'speed', 'optimi', 'performance'],
+      security: ['security', 'firewall', 'protect', 'spam'],
+      blog: ['blog', 'editor', 'content', 'post'],
+      'launch-fast': ['starter', 'elementor', 'builder', 'easy', 'template']
+    };
+
+    const patterns = goalPatterns[goal] || goalPatterns['launch-fast'];
+    const likeFilters = [];
+    const params = [];
+
+    patterns.forEach((token, index) => {
+      const paramPosition = index + 1;
+      params.push(`%${token}%`);
+      likeFilters.push(`(name ILIKE $${paramPosition} OR description ILIKE $${paramPosition})`);
+    });
+
+    const queryText = `
+      SELECT
+        *,
+        ROUND((COALESCE(rating, 0) * 0.7 + LEAST(COALESCE(download_count, 0) / 100000.0, 5) * 0.3)::numeric, 3) AS stack_score
+      FROM items
+      WHERE ${likeFilters.join(' OR ')}
+      ORDER BY stack_score DESC, rating DESC NULLS LAST, download_count DESC NULLS LAST
+      LIMIT 8
+    `;
+
+    const result = await query(queryText, params);
+    res.json({ goal, patterns, items: result.rows });
+  } catch (err) {
+    console.error('Error building stack:', err);
+    res.status(500).json({ error: 'Failed to build stack' });
+  }
+});
+
 // Compare up to 3 items by ids query parameter
 router.get('/compare', async (req, res) => {
   try {
