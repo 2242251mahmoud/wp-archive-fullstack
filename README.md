@@ -9,7 +9,7 @@ A full-stack archive app that collects WordPress themes/plugins and presents the
 - Pagination for large datasets
 - API health badge and retry flow in UI
 - Scheduled scraper with PostgreSQL persistence
-- Frontend CI workflow (lint + build) on GitHub Actions
+- Frontend and backend CI workflows on GitHub Actions
 
 ## Stack
 
@@ -29,11 +29,14 @@ A full-stack archive app that collects WordPress themes/plugins and presents the
 ```text
 wp-archive/
 ├── backend/
+│   ├── app.js
 │   ├── server.js
 │   ├── db.js
 │   ├── scraper.js
 │   ├── seed.js
 │   ├── seed-items.js
+│   ├── tests/
+│   │   └── health.test.js
 │   ├── routes/
 │   │   ├── items.js
 │   │   └── categories.js
@@ -43,8 +46,11 @@ wp-archive/
 │   │   ├── App.jsx
 │   │   ├── App.css
 │   │   └── components/
-│   └── .env.example
-└── .github/workflows/frontend-ci.yml
+│   ├── .env.example
+│   └── vercel.json
+├── .github/workflows/frontend-ci.yml
+├── .github/workflows/backend-ci.yml
+└── render.yaml
 ```
 
 ## Environment Variables
@@ -119,6 +125,13 @@ npm run dev
 Frontend: `http://localhost:5173`
 Backend: `http://localhost:5001`
 
+### 6. Run backend tests
+
+```bash
+cd backend
+npm test
+```
+
 ## API Endpoints
 
 - `GET /api`
@@ -130,15 +143,22 @@ Backend: `http://localhost:5001`
 
 ## CI
 
-GitHub Actions workflow at `.github/workflows/frontend-ci.yml` runs on push/PR for frontend changes:
+Frontend workflow `.github/workflows/frontend-ci.yml` runs on push/PR for frontend changes:
 
 - `npm ci`
 - `npm run lint`
 - `npm run build`
 
+Backend workflow `.github/workflows/backend-ci.yml` runs on push/PR for backend changes:
+
+- `npm ci`
+- `npm test`
+
 ## Deployment
 
 ### Backend Deployment (Render/Railway/Fly.io/VM)
+
+The repository includes `render.yaml` for Render Blueprint deployment.
 
 1. Provision PostgreSQL.
 2. Set backend env variables from `backend/.env.example`.
@@ -155,6 +175,8 @@ GET /api/health
 ```
 
 ### Frontend Deployment (Vercel/Netlify)
+
+The repository includes `frontend/vercel.json` for Vercel defaults.
 
 1. Set root to `frontend`.
 2. Build command:
