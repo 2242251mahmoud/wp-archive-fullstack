@@ -1,0 +1,58 @@
+name: Post Deploy Smoke Test
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "15 * * * *"
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/post-deploy-smoke.yml"
+      - "README.md"
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Load smoke target configuration
+        id: cfg
+        run: |
+          if [ ! -f ".github/smoke-targets.env" ]; then
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "Missing .github/smoke-targets.env; skipping smoke checks."
+            exit 0
+          fi
+
+          FRONTEND_URL=$(grep -E '^SMOKE_FRONTEND_URL=' .github/smoke-targets.env | sed 's/^SMOKE_FRONTEND_URL=//')
+          API_HEALTH_URL=$(grep -E '^SMOKE_API_HEALTH_URL=' .github/smoke-targets.env | sed 's/^SMOKE_API_HEALTH_URL=//')
+
+          echo "frontend_url=$FRONTEND_URL" >> "$GITHUB_OUTPUT"
+          echo "api_health_url=$API_HEALTH_URL" >> "$GITHUB_OUTPUT"
+
+          if [ -z "$FRONTEND_URL" ] || [ -z "$API_HEALTH_URL" ] || [ "$FRONTEND_URL" = "https://your-frontend-domain" ] || [ "$API_HEALTH_URL" = "https://your-api-domain/api/health" ]; then
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "Smoke targets are empty/placeholders; skipping smoke checks."
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+            echo "Smoke URLs configured."
+          fi
+
+      - name: Check frontend URL
+        if: steps.cfg.outputs.configured == 'true'
+        run: |
+          echo "Checking frontend: ${{ steps.cfg.outputs.frontend_url }}"
+          curl --fail --show-error --silent --location --max-time 20 "${{ steps.cfg.outputs.frontend_url }}" > /dev/null
+
+      - name: Check API health URL
+        if: steps.cfg.outputs.configured == 'true'
+        run: |
+          echo "Checking API health: ${{ steps.cfg.outputs.api_health_url }}"
+          curl --fail --show-error --silent --location --max-time 20 "${{ steps.cfg.outputs.api_health_url }}" > /dev/null
+
+      - name: Report skipped run
+        if: steps.cfg.outputs.configured != 'true'
+        run: |
+          echo "Smoke test skipped because required secrets are missing."

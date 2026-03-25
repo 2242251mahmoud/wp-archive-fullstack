@@ -1,6 +1,17 @@
 # WordPress Archive
 
+[![Frontend CI](https://github.com/2242251mahmoud/wp-archive-fullstack/actions/workflows/frontend-ci.yml/badge.svg)](https://github.com/2242251mahmoud/wp-archive-fullstack/actions/workflows/frontend-ci.yml)
+[![Backend CI](https://github.com/2242251mahmoud/wp-archive-fullstack/actions/workflows/backend-ci.yml/badge.svg)](https://github.com/2242251mahmoud/wp-archive-fullstack/actions/workflows/backend-ci.yml)
+[![Post Deploy Smoke Test](https://github.com/2242251mahmoud/wp-archive-fullstack/actions/workflows/post-deploy-smoke.yml/badge.svg)](https://github.com/2242251mahmoud/wp-archive-fullstack/actions/workflows/post-deploy-smoke.yml)
+
 A full-stack archive app that collects WordPress themes/plugins and presents them in a searchable interface with category filters, trending highlights, pagination, sorting, and backend health visibility.
+
+## Live Demo
+
+- Frontend: `https://your-frontend-domain`
+- API health: `https://your-api-domain/api/health`
+
+Replace these with your production URLs after deployment.
 
 ## Highlights
 
@@ -34,6 +45,18 @@ A full-stack archive app that collects WordPress themes/plugins and presents the
 ### Frontend
 - React + Vite
 - Plain CSS with responsive layout
+
+## Architecture
+
+```mermaid
+flowchart LR
+	U[User Browser] --> F[Frontend: React + Vite]
+	F -->|HTTP /api| A[Backend API: Node.js + Express]
+	A --> Q[(PostgreSQL)]
+	A --> S[Scraper + Scheduler]
+	S --> W[WordPress.org Data Sources]
+	A --> H[/api/health]
+```
 
 ## Project Structure
 
@@ -209,6 +232,13 @@ PR title workflow `.github/workflows/pr-title.yml` enforces conventional commit 
 
 Dependency review workflow `.github/workflows/dependency-review.yml` scans dependency diffs on pull requests.
 
+Post-deploy smoke workflow `.github/workflows/post-deploy-smoke.yml` can run on schedule or manually and validates deployed frontend/API URLs.
+
+Configure smoke targets in `.github/smoke-targets.env`:
+
+- `SMOKE_FRONTEND_URL=https://your-frontend-domain`
+- `SMOKE_API_HEALTH_URL=https://your-api-domain/api/health`
+
 ## Deployment
 
 ### Deploy Now
@@ -313,6 +343,20 @@ VITE_API_URL=https://your-backend-domain/api
 - Ensure `VITE_API_URL` is set in frontend platform settings.
 - Confirm value includes `/api` suffix.
 - Rebuild frontend after updating environment variables.
+
+### Smoke test workflow is skipped
+
+- Set real deployment URLs in `.github/smoke-targets.env`.
+- Re-run workflow from Actions tab or wait for next schedule.
+
+## Monitoring
+
+For ongoing uptime visibility, create monitors in UptimeRobot (or Better Stack) for:
+
+- Frontend URL (200 expected)
+- API health URL `/api/health` (200 expected)
+
+After creating monitors, add your public status page link in this README and optionally replace badges with provider-specific status badges.
 
 ## License
 
