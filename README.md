@@ -211,6 +211,27 @@ Dependency review workflow `.github/workflows/dependency-review.yml` scans depen
 
 ## Deployment
 
+### Deploy Now
+
+API deployment shortcuts:
+
+- [![Deploy API on Render](https://img.shields.io/badge/Deploy%20API-Render-46E3B7?logo=render&logoColor=black)](https://render.com/deploy?repo=https://github.com/2242251mahmoud/wp-archive-fullstack)
+- [![Deploy API on Heroku](https://img.shields.io/badge/Deploy%20API-Heroku-430098?logo=heroku&logoColor=white)](https://www.heroku.com/deploy?template=https://github.com/2242251mahmoud/wp-archive-fullstack)
+- [![Deploy API on Railway](https://img.shields.io/badge/Deploy%20API-Railway-0B0D0E?logo=railway&logoColor=white)](https://railway.app/new)
+- [![Deploy API on DigitalOcean](https://img.shields.io/badge/Deploy%20API-DigitalOcean-0080FF?logo=digitalocean&logoColor=white)](https://cloud.digitalocean.com/apps/new)
+- [![Deploy API on Linode](https://img.shields.io/badge/Deploy%20API-Linode-00A95C?logo=linode&logoColor=white)](https://cloud.linode.com/)
+
+Frontend deployment shortcuts:
+
+- [![Deploy Frontend on Vercel](https://img.shields.io/badge/Deploy%20Frontend-Vercel-000000?logo=vercel&logoColor=white)](https://vercel.com/new/clone?repository-url=https://github.com/2242251mahmoud/wp-archive-fullstack&root-directory=frontend)
+- [![Deploy Frontend on Netlify](https://img.shields.io/badge/Deploy%20Frontend-Netlify-00C7B7?logo=netlify&logoColor=white)](https://app.netlify.com/start)
+
+Recommended production setup:
+
+- Deploy API to Render/Heroku/Railway/DigitalOcean/Linode.
+- Deploy frontend to Vercel/Netlify.
+- Set `VITE_API_URL` in frontend to your deployed API URL plus `/api`.
+
 ### Backend Deployment (Render/Railway/Fly.io/VM)
 
 The repository includes `render.yaml` for Render Blueprint deployment.
@@ -230,6 +251,19 @@ GET /api/health
 ```
 
 If deploying with Docker, use `backend/Dockerfile`.
+
+### Heroku Quick Deploy Notes
+
+The repository includes a root `app.json` and `Procfile` for Heroku deploy-button compatibility.
+
+1. Click the Heroku deploy badge.
+2. Provision `heroku-postgresql` addon during setup.
+3. Set required DB env vars if your plan does not auto-wire all values.
+4. Confirm health endpoint:
+
+```text
+GET /api/health
+```
 
 ### Frontend Deployment (Vercel/Netlify)
 
@@ -267,6 +301,18 @@ VITE_API_URL=https://your-backend-domain/api
 - Confirm backend health: `GET /api/health`
 - Verify CORS middleware is enabled in backend
 - Ensure database credentials are valid
+
+### Deploy button created app but API fails at runtime
+
+- Confirm `NODE_ENV=production` and `PORT` are set by platform runtime.
+- Verify database host/user/password/database values are present.
+- For Heroku, verify Postgres addon is attached and credentials are mapped.
+
+### Frontend deploy works but backend calls fail in production
+
+- Ensure `VITE_API_URL` is set in frontend platform settings.
+- Confirm value includes `/api` suffix.
+- Rebuild frontend after updating environment variables.
 
 ## License
 

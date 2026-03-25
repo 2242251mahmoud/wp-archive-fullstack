@@ -84,6 +84,15 @@ curl 'http://localhost:5001/api/items/trending/items?limit=5'
 - Deploy to: Netlify, Vercel, or any Node.js host
 - Update API URL in `frontend/src/App.jsx` to match production backend
 
+### Deploy Now Shortcuts
+- Render API: https://render.com/deploy?repo=https://github.com/2242251mahmoud/wp-archive-fullstack
+- Heroku API: https://www.heroku.com/deploy?template=https://github.com/2242251mahmoud/wp-archive-fullstack
+- Railway API: https://railway.app/new
+- DigitalOcean App Platform: https://cloud.digitalocean.com/apps/new
+- Linode Cloud Manager: https://cloud.linode.com/
+- Vercel frontend (rootDir=frontend): https://vercel.com/new/clone?repository-url=https://github.com/2242251mahmoud/wp-archive-fullstack&root-directory=frontend
+- Netlify frontend: https://app.netlify.com/start
+
 ## Common Commands
 
 ### Run Everything

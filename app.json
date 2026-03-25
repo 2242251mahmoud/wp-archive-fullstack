@@ -1,0 +1,44 @@
+{
+  "name": "WordPress Archive API",
+  "description": "Recommendation-driven WordPress themes/plugins API",
+  "repository": "https://github.com/2242251mahmoud/wp-archive-fullstack",
+  "logo": "https://raw.githubusercontent.com/heroku/node-js-sample/main/public/node.svg",
+  "keywords": ["node", "express", "postgres", "wordpress"],
+  "env": {
+    "NODE_ENV": {
+      "description": "Node environment",
+      "value": "production"
+    },
+    "PORT": {
+      "description": "Port for web process",
+      "value": "5001"
+    },
+    "DB_USER": {
+      "description": "Database username",
+      "required": true
+    },
+    "DB_PASSWORD": {
+      "description": "Database password",
+      "required": true
+    },
+    "DB_HOST": {
+      "description": "Database host",
+      "required": true
+    },
+    "DB_PORT": {
+      "description": "Database port",
+      "value": "5432"
+    },
+    "DB_NAME": {
+      "description": "Database name",
+      "required": true
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "basic"
+    }
+  },
+  "addons": ["heroku-postgresql:essential-0"]
+}
