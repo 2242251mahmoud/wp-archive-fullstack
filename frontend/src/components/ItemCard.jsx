@@ -32,8 +32,8 @@ export default function ItemCard({
         <p className="description">{item.description?.substring(0, 100)}...</p>
         <div className="meta">
           <span className="author">By {item.author}</span>
-          {item.rating > 0 && (
-            <span className="rating">★ {item.rating.toFixed(1)}</span>
+          {Number(item.rating) > 0 && (
+            <span className="rating">★ {Number(item.rating).toFixed(1)}</span>
           )}
         </div>
       </div>
