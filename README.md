@@ -289,8 +289,11 @@ MIT
 Use these ready-made assets to showcase this project on your personal website:
 
 - `portfolio-kit/case-study.md` - long-form narrative case study
+- `portfolio-kit/case-study-short.md` - concise portfolio-ready case study version
 - `portfolio-kit/site-copy.md` - short/medium copy blocks, SEO text, CTAs
 - `portfolio-kit/project-data.json` - structured project metadata for dynamic site rendering
 - `portfolio-kit/case-study.html` - standalone polished case study web page
+- `portfolio-kit/wordpress-page-blueprint.md` - section-by-section WordPress page layout guide
+- `portfolio-kit/seo-social.json` - ready SEO/OG/Twitter metadata payload
 - `PORTFOLIO_CASE_STUDY.md` - expanded engineering + product storytelling
 - `PORTFOLIO_SNIPPETS.md` - resume and project card snippets
