@@ -32,8 +32,8 @@ export default function Sidebar({ categories, selectedCategory, onCategoryChange
             trending.map((item) => (
               <div key={item.id} className="trending-item">
                 <h4>{item.name}</h4>
-                {item.rating > 0 && (
-                  <span className="rating">★ {item.rating.toFixed(1)}</span>
+                {Number(item.rating) > 0 && (
+                  <span className="rating">★ {Number(item.rating).toFixed(1)}</span>
                 )}
               </div>
             ))
