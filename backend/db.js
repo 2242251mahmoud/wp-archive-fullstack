@@ -1,11 +1,15 @@
 const { Pool } = require('pg');
 
+const dbHost = process.env.DB_HOST || 'localhost';
+const useSSL = /render\.com$/i.test(dbHost) || process.env.DB_SSL === 'true';
+
 const pool = new Pool({
   user: process.env.DB_USER || 'coder',
   password: process.env.DB_PASSWORD || '',
-  host: process.env.DB_HOST || 'localhost',
+  host: dbHost,
   port: process.env.DB_PORT || 5432,
   database: process.env.DB_NAME || 'wp_archive',
+  ssl: useSSL ? { rejectUnauthorized: false } : undefined,
 });
 
 const initDB = async () => {
