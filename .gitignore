@@ -18,3 +18,8 @@ yarn-error.log*
 # OS/editor
 .DS_Store
 .vscode/
+
+# Owner-only portfolio prep (keep out of public repo)
+private-notes/
+portfolio-private/
+*.private.md
