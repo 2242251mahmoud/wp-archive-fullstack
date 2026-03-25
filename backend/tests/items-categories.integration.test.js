@@ -146,4 +146,29 @@ describe('Items and categories API integration', () => {
     expect(response.body.goal).toBe('seo');
     expect(response.body.items).toHaveLength(1);
   });
+
+  test('GET /api/items/implementation-plan rejects missing ids', async () => {
+    const response = await request(app).get('/api/items/implementation-plan');
+
+    expect(response.statusCode).toBe(400);
+    expect(response.body.error).toMatch(/at least 1/i);
+  });
+
+  test('GET /api/items/implementation-plan returns checklist and commands', async () => {
+    query.mockResolvedValueOnce({
+      rows: [
+        { id: 2, name: 'Yoast SEO', slug: 'wordpress-seo', category_id: 2 },
+        { id: 1, name: 'Astra', slug: 'astra', category_id: 1 }
+      ]
+    });
+
+    const response = await request(app)
+      .get('/api/items/implementation-plan?ids=2,1&profile=personal-brand');
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body.profile).toBe('personal-brand');
+    expect(response.body.checklist.length).toBeGreaterThan(0);
+    expect(response.body.commands).toContain('wp plugin install wordpress-seo --activate');
+    expect(response.body.commands).toContain('wp theme install astra --activate');
+  });
 });

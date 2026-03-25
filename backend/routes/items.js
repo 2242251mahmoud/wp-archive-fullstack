@@ -217,6 +217,70 @@ router.get('/stack', async (req, res) => {
   }
 });
 
+// Generate an implementation blueprint for selected items
+router.get('/implementation-plan', async (req, res) => {
+  try {
+    const idsParam = (req.query.ids || '').toString();
+    const profile = (req.query.profile || 'personal-brand').toString().toLowerCase();
+    const ids = idsParam
+      .split(',')
+      .map((id) => parseInt(id, 10))
+      .filter((id) => Number.isFinite(id));
+
+    if (ids.length < 1) {
+      return res.status(400).json({ error: 'Provide at least 1 valid item id in ids query parameter' });
+    }
+
+    const uniqueIds = [...new Set(ids)].slice(0, 8);
+    const placeholders = uniqueIds.map((_, i) => `$${i + 1}`).join(', ');
+    const selectedResult = await query(
+      `SELECT * FROM items WHERE id IN (${placeholders}) ORDER BY rating DESC NULLS LAST, download_count DESC NULLS LAST`,
+      uniqueIds
+    );
+
+    const profileSteps = {
+      'personal-brand': [
+        'Install selected theme/plugin stack',
+        'Set homepage hero, about section, and projects grid',
+        'Configure contact form and social links',
+        'Run performance and SEO plugin baseline setup',
+        'Connect analytics and submit sitemap'
+      ],
+      agency: [
+        'Install selected stack and agency starter pages',
+        'Create services, case studies, and lead form flows',
+        'Configure caching, image optimization, and CDN',
+        'Set up CRM/email automation integrations',
+        'Harden security policy and backup schedule'
+      ],
+      saas: [
+        'Install selected stack and landing page templates',
+        'Implement product tour, pricing, and signup pages',
+        'Configure conversion tracking and events',
+        'Set up transactional email and status pages',
+        'Run launch QA for mobile, speed, and accessibility'
+      ]
+    };
+
+    const steps = profileSteps[profile] || profileSteps['personal-brand'];
+    const commands = selectedResult.rows.map((item) => {
+      const installType = item.category_id === 1 ? 'theme' : 'plugin';
+      const slug = item.slug || item.name.toLowerCase().replace(/\s+/g, '-');
+      return `wp ${installType} install ${slug} --activate`;
+    });
+
+    res.json({
+      profile,
+      selected_items: selectedResult.rows,
+      checklist: steps,
+      commands
+    });
+  } catch (err) {
+    console.error('Error generating implementation plan:', err);
+    res.status(500).json({ error: 'Failed to generate implementation plan' });
+  }
+});
+
 // Compare up to 3 items by ids query parameter
 router.get('/compare', async (req, res) => {
   try {

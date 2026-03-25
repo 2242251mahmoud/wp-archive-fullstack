@@ -24,6 +24,7 @@ function createApp() {
         insights: '/api/items/insights',
         recommendations: '/api/items/recommendations',
         stack: '/api/items/stack?goal=seo',
+        implementation_plan: '/api/items/implementation-plan?ids=1,2&profile=personal-brand',
         compare: '/api/items/compare?ids=1,2'
       }
     });

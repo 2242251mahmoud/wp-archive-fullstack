@@ -38,6 +38,9 @@ function App() {
   const [stackGoal, setStackGoal] = useState('launch-fast');
   const [stackItems, setStackItems] = useState([]);
   const [shareCopied, setShareCopied] = useState(false);
+  const [siteProfile, setSiteProfile] = useState('personal-brand');
+  const [launchPlan, setLaunchPlan] = useState(null);
+  const [planCopied, setPlanCopied] = useState(false);
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
@@ -209,6 +212,21 @@ function App() {
     }
   };
 
+  const fetchLaunchPlan = async (ids, profile) => {
+    try {
+      const response = await fetch(
+        `${API_URL}/items/implementation-plan?ids=${ids.join(',')}&profile=${encodeURIComponent(profile)}`
+      );
+      if (!response.ok) {
+        throw new Error('Failed to generate implementation plan');
+      }
+      const data = await response.json();
+      setLaunchPlan(data);
+    } catch (err) {
+      console.error('Error fetching launch plan:', err);
+    }
+  };
+
   const retryAll = () => {
     checkApiStatus();
     fetchItems();
@@ -243,6 +261,32 @@ function App() {
       setTimeout(() => setShareCopied(false), 1400);
     } catch (err) {
       console.error('Failed to copy share snapshot:', err);
+    }
+  };
+
+  const generateLaunchPlan = () => {
+    const ids = (compareItems.length > 0 ? compareItems : stackItems).slice(0, 5).map((item) => item.id);
+    if (ids.length === 0) {
+      return;
+    }
+    fetchLaunchPlan(ids, siteProfile);
+  };
+
+  const copyLaunchPlan = async () => {
+    if (!launchPlan) {
+      return;
+    }
+
+    const checklistText = launchPlan.checklist.map((step, index) => `${index + 1}. ${step}`).join('\n');
+    const commandText = launchPlan.commands.map((command) => `- ${command}`).join('\n');
+    const payload = `Launch Blueprint (${launchPlan.profile})\n\nChecklist:\n${checklistText}\n\nWP-CLI Commands:\n${commandText}`;
+
+    try {
+      await navigator.clipboard.writeText(payload);
+      setPlanCopied(true);
+      setTimeout(() => setPlanCopied(false), 1500);
+    } catch (err) {
+      console.error('Failed to copy launch plan:', err);
     }
   };
 
@@ -451,6 +495,58 @@ function App() {
                 />
               ))}
             </div>
+          </section>
+
+          <section className="launch-blueprint">
+            <div className="section-head">
+              <h3>Launch Blueprint</h3>
+              <div className="stack-controls">
+                <select
+                  className="sort-select"
+                  value={siteProfile}
+                  onChange={(e) => setSiteProfile(e.target.value)}
+                >
+                  <option value="personal-brand">Personal Brand</option>
+                  <option value="agency">Agency</option>
+                  <option value="saas">SaaS</option>
+                </select>
+                <button type="button" className="switch-btn active" onClick={generateLaunchPlan}>
+                  Generate Plan
+                </button>
+                <button
+                  type="button"
+                  className={planCopied ? 'switch-btn active' : 'switch-btn'}
+                  onClick={copyLaunchPlan}
+                >
+                  {planCopied ? 'Plan Copied' : 'Copy Plan'}
+                </button>
+              </div>
+            </div>
+
+            {launchPlan ? (
+              <div className="blueprint-grid">
+                <article className="blueprint-card">
+                  <h4>Execution Checklist</h4>
+                  <ol>
+                    {launchPlan.checklist.map((step) => (
+                      <li key={step}>{step}</li>
+                    ))}
+                  </ol>
+                </article>
+                <article className="blueprint-card">
+                  <h4>WP-CLI Command Pack</h4>
+                  <ul>
+                    {launchPlan.commands.map((command) => (
+                      <li key={command}><code>{command}</code></li>
+                    ))}
+                  </ul>
+                </article>
+              </div>
+            ) : (
+              <p className="blueprint-hint">
+                Generate a deployment-ready implementation plan from your current Stack Builder or Compare Bench selections.
+              </p>
+            )}
           </section>
 
           <section className="insights-panel">
