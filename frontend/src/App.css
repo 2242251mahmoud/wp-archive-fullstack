@@ -236,6 +236,11 @@
   border-color: rgba(15, 118, 110, 0.45);
 }
 
+.api-playground-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .api-playground-request,
 .api-playground-state,
 .api-playground-error {

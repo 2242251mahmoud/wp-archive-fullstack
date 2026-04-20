@@ -216,22 +216,36 @@ function App() {
             <h2>API Playground</h2>
             <p>Click an endpoint to send a live request and inspect the JSON response.</p>
             <div className="api-playground-actions">
-              <button type="button" onClick={() => runApiPlaygroundRequest('/health')}>
+              <button
+                type="button"
+                disabled={apiPlaygroundLoading}
+                onClick={() => runApiPlaygroundRequest('/health')}
+              >
                 GET /health
               </button>
-              <button type="button" onClick={() => runApiPlaygroundRequest('/categories')}>
+              <button
+                type="button"
+                disabled={apiPlaygroundLoading}
+                onClick={() => runApiPlaygroundRequest('/categories')}
+              >
                 GET /categories
               </button>
-              <button type="button" onClick={() => runApiPlaygroundRequest('/items?page=1&limit=5')}>
+              <button
+                type="button"
+                disabled={apiPlaygroundLoading}
+                onClick={() => runApiPlaygroundRequest('/items?page=1&limit=5')}
+              >
                 GET /items?page=1&limit=5
               </button>
             </div>
-            {apiPlaygroundRequest && <p className="api-playground-request">{apiPlaygroundRequest}</p>}
-            {apiPlaygroundLoading && <p className="api-playground-state">Loading response...</p>}
-            {apiPlaygroundError && <p className="api-playground-error">{apiPlaygroundError}</p>}
-            {!apiPlaygroundLoading && apiPlaygroundResult && (
-              <pre className="api-playground-result">{JSON.stringify(apiPlaygroundResult, null, 2)}</pre>
-            )}
+            <div className="api-playground-feedback" aria-live="polite" aria-atomic="true">
+              {apiPlaygroundRequest && <p className="api-playground-request">{apiPlaygroundRequest}</p>}
+              {apiPlaygroundLoading && <p className="api-playground-state">Loading response...</p>}
+              {apiPlaygroundError && <p className="api-playground-error">{apiPlaygroundError}</p>}
+              {!apiPlaygroundLoading && apiPlaygroundResult && (
+                <pre className="api-playground-result">{JSON.stringify(apiPlaygroundResult, null, 2)}</pre>
+              )}
+            </div>
           </section>
 
           <SearchBar value={search} onChange={handleSearch} />
