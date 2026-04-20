@@ -17,6 +17,10 @@ function App() {
   const [error, setError] = useState('');
   const [apiStatus, setApiStatus] = useState('checking');
   const [sortBy, setSortBy] = useState('updated');
+  const [apiPlaygroundLoading, setApiPlaygroundLoading] = useState(false);
+  const [apiPlaygroundError, setApiPlaygroundError] = useState('');
+  const [apiPlaygroundRequest, setApiPlaygroundRequest] = useState('');
+  const [apiPlaygroundResult, setApiPlaygroundResult] = useState(null);
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
@@ -113,6 +117,28 @@ function App() {
     fetchTrending();
   };
 
+  const runApiPlaygroundRequest = async (path) => {
+    try {
+      setApiPlaygroundLoading(true);
+      setApiPlaygroundError('');
+      const requestUrl = `${API_URL}${path}`;
+      setApiPlaygroundRequest(`GET ${requestUrl}`);
+
+      const response = await fetch(requestUrl);
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`);
+      }
+
+      const data = await response.json();
+      setApiPlaygroundResult(data);
+    } catch (err) {
+      setApiPlaygroundError(err.message || 'Request failed');
+      setApiPlaygroundResult(null);
+    } finally {
+      setApiPlaygroundLoading(false);
+    }
+  };
+
   const getSortedItems = () => {
     const list = [...items];
 
@@ -186,6 +212,28 @@ function App() {
         </aside>
 
         <main className="main">
+          <section className="api-playground" aria-label="API playground">
+            <h2>API Playground</h2>
+            <p>Click an endpoint to send a live request and inspect the JSON response.</p>
+            <div className="api-playground-actions">
+              <button type="button" onClick={() => runApiPlaygroundRequest('/health')}>
+                GET /health
+              </button>
+              <button type="button" onClick={() => runApiPlaygroundRequest('/categories')}>
+                GET /categories
+              </button>
+              <button type="button" onClick={() => runApiPlaygroundRequest('/items?page=1&limit=5')}>
+                GET /items?page=1&limit=5
+              </button>
+            </div>
+            {apiPlaygroundRequest && <p className="api-playground-request">{apiPlaygroundRequest}</p>}
+            {apiPlaygroundLoading && <p className="api-playground-state">Loading response...</p>}
+            {apiPlaygroundError && <p className="api-playground-error">{apiPlaygroundError}</p>}
+            {!apiPlaygroundLoading && apiPlaygroundResult && (
+              <pre className="api-playground-result">{JSON.stringify(apiPlaygroundResult, null, 2)}</pre>
+            )}
+          </section>
+
           <SearchBar value={search} onChange={handleSearch} />
 
           <section className="toolbar" aria-label="Results controls">
